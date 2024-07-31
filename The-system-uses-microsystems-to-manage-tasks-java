@@ -1,0 +1,152 @@
+package com.example.taskservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class TaskServiceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TaskServiceApplication.class, args);
+    }
+}
+
+package com.example.taskservice.model;
+
+import javax.persistence.*;
+
+@Entity
+public class Task {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+    private String description;
+    private TaskStatus status;
+
+   public Task(String title, String description, TaskStatus status) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+}
+}
+
+package com.example.taskservice.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation;
+import org.springframework.web.application;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Sortedset
+
+
+@RestController
+@RequestMapping("/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService taskService;
+
+    @GetMapping
+    public List<Task> getAllTasks() {
+        return taskService.getAllTasks();
+    }
+
+    @GetMapping("/{id}")
+    public Task getTaskById(@PathVariable Long id) {
+        return taskService.getTaskById(id);
+    }
+
+    @PostMapping
+    public Task createTask(@RequestBody Task task) {
+        return taskService.createTask(task);
+    }
+
+    @PutMapping("/{id}")
+    public Task updateTask(@PathVariable Long id, @RequestBody Task task) {
+        return taskService.updateTask(id, task);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
+    }
+}
+
+package com.example.taskservice.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class TaskService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
+
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id).orElse(null);
+    }
+
+    public Task createTask(Task task) {
+        return taskRepository.save(task);
+    }
+
+    public Task updateTask(Long id, Task task) {
+        task.setId(id);
+        return taskRepository.save(task);
+    }
+
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
+    }
+}
+
+package com.example.taskservice.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TaskRepository extends JpaRepository<Task, Long> {
+}
